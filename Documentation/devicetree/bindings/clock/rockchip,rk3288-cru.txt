@@ -22,6 +22,9 @@ Optional Properties:
 
 - rockchip,grf: phandle to the syscon managing the "general register files"
   If missing pll rates are not changeable, due to the missing pll lock status.
+- rockchip,npll-for-vop: u32 0 or 1, dedicates NPLL to a VOP output unit for
+  more frequency flexibility for the selected VOP output at a cost of
+  flexibility for other devices. Disabled if not present or -1.
 
 Each clock is assigned an identifier and client nodes can use this identifier
 to specify the clock which they consume. All available clocks are defined as
