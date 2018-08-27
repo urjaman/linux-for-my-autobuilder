@@ -195,10 +195,14 @@ PNAME(mux_ddrphy_p)		= { "dpll_ddr", "gpll_ddr" };
 PNAME(mux_aclk_cpu_src_p)	= { "cpll_aclk_cpu", "gpll_aclk_cpu" };
 
 PNAME(mux_pll_src_cpll_gpll_p)		= { "cpll", "gpll" };
-PNAME(mux_pll_src_npll_cpll_gpll_p)	= { "npll", "cpll", "gpll" };
-PNAME(mux_pll_src_cpll_gpll_npll_p)	= { "cpll", "gpll", "npll" };
+PNAME_ED(mux_pll_src_npll_cpll_gpll_p)	= { "npll", "cpll", "gpll" };
+
+PNAME_ED(mux_pll_src_cgn_pll_nonvop_p)	= { "cpll", "gpll", "npll" };
+PNAME_ED(mux_pll_src_cgn_pll_vop0_p) = { "cpll", "gpll", "npll" };
+PNAME_ED(mux_pll_src_cgn_pll_vop1_p) = { "cpll", "gpll", "npll" };
+
 PNAME(mux_pll_src_cpll_gpll_usb480m_p)	= { "cpll", "gpll", "unstable:usbphy480m_src" };
-PNAME(mux_pll_src_cpll_gll_usb_npll_p)	= { "cpll", "gpll", "unstable:usbphy480m_src", "npll" };
+PNAME_ED(mux_pll_src_cpll_gll_usb_npll_p) = { "cpll", "gpll", "unstable:usbphy480m_src", "npll" };
 
 PNAME(mux_mmc_src_p)	= { "cpll", "gpll", "xin24m", "xin24m" };
 PNAME(mux_i2s_pre_p)	= { "i2s_src", "i2s_frac", "ext_i2s", "xin12m" };
@@ -442,24 +446,24 @@ static struct rockchip_clk_branch rk3288_clk_branches[] __initdata = {
 			RK3288_CLKSEL_CON(30), 14, 2, MFLAGS, 8, 5, DFLAGS,
 			RK3288_CLKGATE_CON(3), 4, GFLAGS),
 
-	COMPOSITE(DCLK_VOP0, "dclk_vop0", mux_pll_src_cpll_gpll_npll_p, 0,
+	COMPOSITE(DCLK_VOP0, "dclk_vop0", mux_pll_src_cgn_pll_vop0_p, 0,
 			RK3288_CLKSEL_CON(27), 0, 2, MFLAGS, 8, 8, DFLAGS,
 			RK3288_CLKGATE_CON(3), 1, GFLAGS),
-	COMPOSITE(DCLK_VOP1, "dclk_vop1", mux_pll_src_cpll_gpll_npll_p, 0,
+	COMPOSITE(DCLK_VOP1, "dclk_vop1", mux_pll_src_cgn_pll_vop1_p, 0,
 			RK3288_CLKSEL_CON(29), 6, 2, MFLAGS, 8, 8, DFLAGS,
 			RK3288_CLKGATE_CON(3), 3, GFLAGS),
 
 	COMPOSITE_NODIV(SCLK_EDP_24M, "sclk_edp_24m", mux_edp_24m_p, 0,
 			RK3288_CLKSEL_CON(28), 15, 1, MFLAGS,
 			RK3288_CLKGATE_CON(3), 12, GFLAGS),
-	COMPOSITE(SCLK_EDP, "sclk_edp", mux_pll_src_cpll_gpll_npll_p, 0,
+	COMPOSITE(SCLK_EDP, "sclk_edp", mux_pll_src_cgn_pll_nonvop_p, 0,
 			RK3288_CLKSEL_CON(28), 6, 2, MFLAGS, 0, 6, DFLAGS,
 			RK3288_CLKGATE_CON(3), 13, GFLAGS),
 
-	COMPOSITE(SCLK_ISP, "sclk_isp", mux_pll_src_cpll_gpll_npll_p, 0,
+	COMPOSITE(SCLK_ISP, "sclk_isp", mux_pll_src_cgn_pll_nonvop_p, 0,
 			RK3288_CLKSEL_CON(6), 6, 2, MFLAGS, 0, 6, DFLAGS,
 			RK3288_CLKGATE_CON(3), 14, GFLAGS),
-	COMPOSITE(SCLK_ISP_JPE, "sclk_isp_jpe", mux_pll_src_cpll_gpll_npll_p, 0,
+	COMPOSITE(SCLK_ISP_JPE, "sclk_isp_jpe", mux_pll_src_cgn_pll_nonvop_p, 0,
 			RK3288_CLKSEL_CON(6), 14, 2, MFLAGS, 8, 6, DFLAGS,
 			RK3288_CLKGATE_CON(3), 15, GFLAGS),
 
@@ -468,16 +472,16 @@ static struct rockchip_clk_branch rk3288_clk_branches[] __initdata = {
 	GATE(SCLK_HDMI_CEC, "sclk_hdmi_cec", "xin32k", 0,
 			RK3288_CLKGATE_CON(5), 11, GFLAGS),
 
-	COMPOSITE(ACLK_HEVC, "aclk_hevc", mux_pll_src_cpll_gpll_npll_p, 0,
+	COMPOSITE(ACLK_HEVC, "aclk_hevc", mux_pll_src_cgn_pll_nonvop_p, 0,
 			RK3288_CLKSEL_CON(39), 14, 2, MFLAGS, 8, 5, DFLAGS,
 			RK3288_CLKGATE_CON(13), 13, GFLAGS),
 	DIV(HCLK_HEVC, "hclk_hevc", "aclk_hevc", 0,
 			RK3288_CLKSEL_CON(40), 12, 2, DFLAGS),
 
-	COMPOSITE(SCLK_HEVC_CABAC, "sclk_hevc_cabac", mux_pll_src_cpll_gpll_npll_p, 0,
+	COMPOSITE(SCLK_HEVC_CABAC, "sclk_hevc_cabac", mux_pll_src_cgn_pll_nonvop_p, 0,
 			RK3288_CLKSEL_CON(42), 6, 2, MFLAGS, 0, 5, DFLAGS,
 			RK3288_CLKGATE_CON(13), 14, GFLAGS),
-	COMPOSITE(SCLK_HEVC_CORE, "sclk_hevc_core", mux_pll_src_cpll_gpll_npll_p, 0,
+	COMPOSITE(SCLK_HEVC_CORE, "sclk_hevc_core", mux_pll_src_cgn_pll_nonvop_p, 0,
 			RK3288_CLKSEL_CON(42), 14, 2, MFLAGS, 8, 5, DFLAGS,
 			RK3288_CLKGATE_CON(13), 15, GFLAGS),
 
@@ -551,7 +555,7 @@ static struct rockchip_clk_branch rk3288_clk_branches[] __initdata = {
 	COMPOSITE(0, "sclk_tspout", mux_tspout_p, 0,
 			RK3288_CLKSEL_CON(35), 14, 2, MFLAGS, 8, 5, DFLAGS,
 			RK3288_CLKGATE_CON(4), 11, GFLAGS),
-	COMPOSITE(0, "sclk_tsp", mux_pll_src_cpll_gpll_npll_p, 0,
+	COMPOSITE(0, "sclk_tsp", mux_pll_src_cgn_pll_nonvop_p, 0,
 			RK3288_CLKSEL_CON(35), 6, 2, MFLAGS, 0, 5, DFLAGS,
 			RK3288_CLKGATE_CON(4), 10, GFLAGS),
 
@@ -932,11 +936,52 @@ static void __init rk3288_common_init(struct device_node *np,
 				      enum rk3288_variant soc)
 {
 	struct rockchip_clk_provider *ctx;
+	s32 npll_vop = -1;
 
 	rk3288_cru_base = of_iomap(np, 0);
 	if (!rk3288_cru_base) {
 		pr_err("%s: could not map cru region\n", __func__);
 		return;
+	}
+
+	if (!of_property_read_s32(np, "rockchip,npll-for-vop", &npll_vop)) {
+		if ((npll_vop < -1) || (npll_vop > 1)) {
+			pr_warn("%s: invalid VOP to dedicate NPLL to: %d\n",
+				__func__, npll_vop);
+		} else if (npll_vop >= 0) {
+			unsigned int vop_clk_id;
+			const char ** npll_names;
+			const char ** non_npll_names;
+			int i;
+
+			/* Firstly, not-VOP needs to not use npll */
+			mux_pll_src_npll_cpll_gpll_p[0] = "dummy_npll";
+			mux_pll_src_cgn_pll_nonvop_p[2] = "dummy_npll";
+			mux_pll_src_cpll_gll_usb_npll_p[3] = "dummy_npll";
+
+			/* Then the npll VOP needs to only use npll, and the other one not use npll. */
+			if (npll_vop) {
+				vop_clk_id = DCLK_VOP1;
+				npll_names = mux_pll_src_cgn_pll_vop1_p;
+				non_npll_names = mux_pll_src_cgn_pll_vop0_p;
+			} else {
+				vop_clk_id = DCLK_VOP0;
+				npll_names = mux_pll_src_cgn_pll_vop0_p;
+				non_npll_names = mux_pll_src_cgn_pll_vop1_p;
+			}
+			npll_names[0] = "dummy_cpll";
+			npll_names[1] = "dummy_gpll";
+			non_npll_names[2] = "dummy_npll";
+
+			/* Lastly the npll-dedicated-VOP needs to be able to control npll. */
+			for (i = 0; i < ARRAY_SIZE(rk3288_clk_branches); i++) {
+				if (rk3288_clk_branches[i].id == vop_clk_id) {
+					rk3288_clk_branches[i].flags |= CLK_SET_RATE_PARENT;
+					break;
+				}
+			}
+			pr_debug("%s: npll dedicated for VOP %d\n", __func__, npll_vop);
+		}
 	}
 
 	ctx = rockchip_clk_init(np, rk3288_cru_base, CLK_NR_CLKS);
