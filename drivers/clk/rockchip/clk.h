@@ -442,6 +442,9 @@ struct clk *rockchip_clk_register_muxgrf(const char *name,
 
 #define PNAME(x) static const char *const x[] __initconst
 
+/* For when you want to be able to modify the pointers. */
+#define PNAME_ED(x) static const char * x[] __initdata
+
 enum rockchip_clk_branch_type {
 	branch_composite,
 	branch_mux,
