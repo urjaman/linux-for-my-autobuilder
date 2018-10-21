@@ -995,12 +995,14 @@ static int mmc_blk_reset(struct mmc_blk_data *md, struct mmc_host *host,
 			 int type)
 {
 	struct mmc_blk_data *main_md = dev_get_drvdata(&host->card->dev);
+	int retries = 1;
 	int err;
 
 	if (md->reset_done & type)
 		return -EEXIST;
 
 	md->reset_done |= type;
+retry:
 	err = mmc_hw_reset(host);
 	/*
 	 * A successful reset will leave the card in the main partition, but
@@ -1008,6 +1010,12 @@ static int mmc_blk_reset(struct mmc_blk_data *md, struct mmc_host *host,
 	 * in that case.
 	 */
 	main_md->part_curr = err ? MMC_BLK_PART_INVALID : main_md->part_type;
+
+	/* Retry once because the C201 eMMC can be touchy */
+	if ((err) && (retries--)) {
+		goto retry;
+	}
+
 	if (err)
 		return err;
 	/* Ensure we switch back to the correct partition */
