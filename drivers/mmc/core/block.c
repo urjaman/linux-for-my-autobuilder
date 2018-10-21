@@ -1026,6 +1026,7 @@ static unsigned int mmc_blk_data_timeout_ms(struct mmc_host *host,
 static int mmc_blk_reset(struct mmc_blk_data *md, struct mmc_host *host,
 			 int type)
 {
+	int retries = 1;
 	int err;
 	struct mmc_blk_data *main_md = dev_get_drvdata(&host->card->dev);
 
@@ -1033,7 +1034,14 @@ static int mmc_blk_reset(struct mmc_blk_data *md, struct mmc_host *host,
 		return -EEXIST;
 
 	md->reset_done |= type;
+retry:
 	err = mmc_hw_reset(host->card);
+
+	/* Retry once because the C201 eMMC can be touchy */
+	if ((err) && (retries--)) {
+		goto retry;
+	}
+
 	/*
 	 * A successful reset will leave the card in the main partition, but
 	 * upon failure it might not be, so set it to MMC_BLK_PART_INVALID
