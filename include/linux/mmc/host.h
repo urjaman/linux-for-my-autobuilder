@@ -398,6 +398,7 @@ struct mmc_host {
 #else
 #define MMC_CAP2_CRYPTO		0
 #endif
+#define MMC_CAP2_NO_RECOVERY_CACHE_FLUSH	(1 << 28)	/* Do not flush the device cache when recovering */
 
 	int			fixed_drv_type;	/* fixed driver type for non-removable media */
 
