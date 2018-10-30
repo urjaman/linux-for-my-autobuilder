@@ -2227,6 +2227,12 @@ static int mmc_runtime_resume(struct mmc_host *host)
 	return 0;
 }
 
+static inline int mmc_can_flush_during_recovery(
+	struct mmc_host *host)
+{
+	return (host->caps2 & MMC_CAP2_NO_RECOVERY_CACHE_FLUSH) == 0;
+}
+
 static int mmc_can_reset(struct mmc_card *card)
 {
 	u8 rst_n_function;
@@ -2241,11 +2247,15 @@ static int _mmc_hw_reset(struct mmc_host *host)
 {
 	struct mmc_card *card = host->card;
 
-	/*
-	 * In the case of recovery, we can't expect flushing the cache to work
-	 * always, but we have a go and ignore errors.
+	/* Using a "Cache flush" during recovery events seems...
+	 * "dubious" at best, and generate significant issues on
+	 * some platforms, like 10 minutes hang up, at worst.
+	 * I'm keeping this line because the old code did it but...
+	 * feel free to double check if that's needed at all.
 	 */
-	_mmc_flush_cache(host);
+
+	if (mmc_can_flush_during_recovery(host))
+		_mmc_flush_cache(host);
 
 	if ((host->caps & MMC_CAP_HW_RESET) && host->ops->card_hw_reset &&
 	     mmc_can_reset(card)) {
