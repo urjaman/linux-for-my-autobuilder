@@ -530,6 +530,8 @@ static int dwc2_driver_probe(struct platform_device *dev)
 	 * other time after this.
 	 */
 	dwc2_force_dr_mode(hsotg);
+	/* HACK: Always start in host mode, even if you think you're an otg device :P */
+	dwc2_force_mode(hsotg, true);
 
 	retval = dwc2_init_params(hsotg);
 	if (retval)
