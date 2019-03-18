@@ -114,6 +114,55 @@ static const struct file_operations testmode_fops = {
 	.release	= single_release,
 };
 
+static ssize_t cur_mode_write(struct file *file, const char __user *ubuf, size_t
+		count, loff_t *ppos)
+{
+	struct seq_file		*s = file->private_data;
+	struct dwc2_hsotg	*hsotg = s->private;
+	int mode = 0;
+	char			buf[32];
+
+	if (copy_from_user(&buf, ubuf, min_t(size_t, sizeof(buf) - 1, count)))
+		return -EFAULT;
+
+	if (!strncmp(buf, "device", 6))
+		mode = 1;
+	else if (!strncmp(buf, "host", 4))
+		mode = 2;
+	else
+		mode = 0; /* otg/clear */
+
+	dwc2_clear_force_mode(hsotg);
+	switch (mode) {
+		case 1: dwc2_force_mode(hsotg, false); break;
+		case 2: dwc2_force_mode(hsotg, true); break;
+	}
+	return count;
+}
+
+
+static int cur_mode_show(struct seq_file *s, void *unused)
+{
+	struct dwc2_hsotg *hsotg = s->private;
+	seq_puts(s, dwc2_is_device_mode(hsotg) ? "device\n" : "host\n");
+	return 0;
+}
+
+
+static int cur_mode_open(struct inode *inode, struct file *file)
+{
+	return single_open(file, cur_mode_show, inode->i_private);
+}
+
+static const struct file_operations cur_mode_fops = {
+	.owner		= THIS_MODULE,
+	.open		= cur_mode_open,
+	.write		= cur_mode_write,
+	.read		= seq_read,
+	.llseek		= seq_lseek,
+	.release	= single_release,
+};
+
 /**
  * state_show - debugfs: show overall driver and device state.
  * @seq: The seq file to write to.
@@ -300,6 +349,7 @@ static void dwc2_hsotg_create_debug(struct dwc2_hsotg *hsotg)
 	debugfs_create_file("state", 0444, root, hsotg, &state_fops);
 	debugfs_create_file("testmode", 0644, root, hsotg, &testmode_fops);
 	debugfs_create_file("fifo", 0444, root, hsotg, &fifo_fops);
+	debugfs_create_file("cur_mode", 0644, root, hsotg, &cur_mode_fops);
 
 	/* Create one file for each out endpoint */
 	for (epidx = 0; epidx < hsotg->num_of_eps; epidx++) {
