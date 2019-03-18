@@ -436,8 +436,8 @@
 
 	assigned-clocks = <&cru SCLK_USBPHY480M_SRC>;
 	assigned-clock-parents = <&usbphy0>;
-	dr_mode = "host";
 	snps,need-phy-for-wake;
+	/* dr_mode = "host"; */
 };
 
 &vopb {
