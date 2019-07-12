@@ -1965,7 +1965,8 @@ static void dwc2_hc_chhltd_intr_dma(struct dwc2_hsotg *hsotg,
 					"hcint 0x%08x, intsts 0x%08x\n",
 					chan->hcint,
 					dwc2_readl(hsotg, GINTSTS));
-				goto error;
+				dwc2_halt_channel(hsotg, chan, qtd,
+					DWC2_HC_XFER_PERIODIC_INCOMPLETE);
 			}
 		}
 	} else {
