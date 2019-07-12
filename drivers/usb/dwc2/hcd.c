@@ -2490,7 +2490,8 @@ static void dwc2_free_dma_aligned_buffer(struct urb *urb)
 		else
 			length = urb->actual_length;
 
-		memcpy(stored_xfer_buffer, urb->transfer_buffer, length);
+		if (stored_xfer_buffer)
+			memcpy(stored_xfer_buffer, urb->transfer_buffer, length);
 	}
 	kfree(urb->transfer_buffer);
 	urb->transfer_buffer = stored_xfer_buffer;
