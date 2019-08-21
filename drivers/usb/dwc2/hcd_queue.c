@@ -1558,6 +1558,16 @@ static void dwc2_qh_init(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh,
 			device_ns += dwc_tt->usb_tt->think_time;
 		qh->device_us = NS_TO_US(device_ns);
 
+    //Only enable workaround for highspeed devices, since only low and full speed devices so split, we can just check split
+    //The packets that fail right after the firmware is transferred are on an interrupt ep so we can use that to further narrow it down
+    //The ath9k device has issues with ep 3 and ep4
+    if(!do_split && !ep_is_isoc && ep_is_int && (urb->pipe_info.ep_num == 3 || urb->pipe_info.ep_num == 4)){
+      if (urb->interval == 1){
+        urb->interval = 4;
+        dev_info(hsotg->dev, "ath9k workaround: set usb urb interval to %d\n", urb->interval);
+      }
+    }
+
 		qh->device_interval = urb->interval;
 		qh->host_interval = urb->interval * (do_split ? 8 : 1);
 
