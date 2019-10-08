@@ -1272,16 +1272,25 @@ static const struct panel_desc innolux_n116bca_ea1 = {
  * porch, back porch, or sync length.  For now we'll leave a single setting
  * here which allows a bit of tweaking of the pixel clock at the expense of
  * refresh rate.
+ *
+ * Experimental testing with one panel suggests that the split among
+ * front/back/sync is not important, but the panel is not stable
+ * at htotal less than 1520 (atleast when running at 74.25 Mhz).
+ *
+ * There exists an experimental mode that gives very close to 60 Hz mode
+ * from 74.25 Mhz with htotal 1543 and vtotal 802 - we allow the
+ * hfront_porch and vback_porch to be adjusted to reach that mode.
+ *
  */
 static const struct display_timing innolux_n116bge_timing = {
 	.pixelclock = { 72600000, 76420000, 80240000 },
 	.hactive = { 1366, 1366, 1366 },
-	.hfront_porch = { 136, 136, 136 },
+	.hfront_porch = { 87, 136, 136 },
 	.hback_porch = { 60, 60, 60 },
 	.hsync_len = { 30, 30, 30 },
 	.vactive = { 768, 768, 768 },
 	.vfront_porch = { 8, 8, 8 },
-	.vback_porch = { 12, 12, 12 },
+	.vback_porch = { 12, 12, 14 },
 	.vsync_len = { 12, 12, 12 },
 	.flags = DISPLAY_FLAGS_VSYNC_LOW | DISPLAY_FLAGS_HSYNC_LOW,
 };
