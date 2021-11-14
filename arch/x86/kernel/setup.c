@@ -650,11 +650,11 @@ static void __init trim_snb_memory(void)
 	 * them from accessing certain memory ranges, namely anything below
 	 * 1M and in the pages listed in bad_pages[] above.
 	 *
-	 * To avoid these pages being ever accessed by SNB gfx devices reserve
-	 * bad_pages that have not already been reserved at boot time.
-	 * All memory below the 1 MB mark is anyway reserved later during
-	 * setup_arch(), so there is no need to reserve it here.
+	 * To avoid these pages being ever accessed by SNB gfx devices
+	 * reserve all memory below the 1 MB mark and bad_pages that have
+	 * not already been reserved at boot time.
 	 */
+	memblock_reserve(0, 1<<20);
 
 	for (i = 0; i < ARRAY_SIZE(bad_pages); i++) {
 		if (memblock_reserve(bad_pages[i], PAGE_SIZE))
@@ -746,14 +746,14 @@ static void __init early_reserve_memory(void)
 	 * The first 4Kb of memory is a BIOS owned area, but generally it is
 	 * not listed as such in the E820 table.
 	 *
-	 * Reserve the first 64K of memory since some BIOSes are known to
-	 * corrupt low memory. After the real mode trampoline is allocated the
-	 * rest of the memory below 640k is reserved.
+	 * Reserve the first memory page and typically some additional
+	 * memory (64KiB by default) since some BIOSes are known to corrupt
+	 * low memory. See the Kconfig help text for X86_RESERVE_LOW.
 	 *
 	 * In addition, make sure page 0 is always reserved because on
 	 * systems with L1TF its contents can be leaked to user processes.
 	 */
-	memblock_reserve(0, SZ_64K);
+	memblock_reserve(0, ALIGN(reserve_low, PAGE_SIZE));
 
 	early_reserve_initrd();
 
@@ -761,7 +761,6 @@ static void __init early_reserve_memory(void)
 
 	reserve_ibft_region();
 	reserve_bios_regions();
-	trim_snb_memory();
 }
 
 /*
@@ -1094,7 +1093,12 @@ void __init setup_arch(char **cmdline_p)
 			(max_pfn_mapped<<PAGE_SHIFT) - 1);
 #endif
 
+	reserve_real_mode();
+
 	/*
+	 * NB: several hundred kilobytes are worth it for i586con.
+	 * The rest of this comment block applies to upstream kernel...
+         *
 	 * Find free memory for the real mode trampoline and place it there. If
 	 * there is not enough free memory under 1M, on EFI-enabled systems
 	 * there will be additional attempt to reclaim the memory for the real
@@ -1108,7 +1112,7 @@ void __init setup_arch(char **cmdline_p)
 	 * Moreover, on machines with SandyBridge graphics or in setups that use
 	 * crashkernel the entire 1M is reserved anyway.
 	 */
-	reserve_real_mode();
+	trim_snb_memory();
 
 	init_mem_mapping();
 
