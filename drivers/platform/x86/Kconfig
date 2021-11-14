@@ -1013,6 +1013,6 @@ config INTEL_SCU_IPC_UTIL
 endif # X86_PLATFORM_DEVICES
 
 config PMC_ATOM
-       def_bool y
+       bool "PMC ATOM"
        depends on PCI
        select COMMON_CLK
